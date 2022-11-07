@@ -34,15 +34,20 @@ public extension SwiftyMenuAttributes {
         case `default`
 
         /** Row with color, background color and selected color */
-        case value(height: Int, backgroundColor: UIColor, selectedColor: UIColor)
+        case value(height: ((_ index: Int) -> CGFloat), backgroundColor: UIColor, selectedColor: UIColor)
 
-        var rowStyleValues: (height: Int, backgroundColor: UIColor, selectedColor: UIColor) {
+        var rowStyleValues: (height: ((_ index: Int) -> CGFloat), backgroundColor: UIColor, selectedColor: UIColor) {
             switch self {
             case let .value(height, backgroundColor, selectedColor):
                 return (height: height, backgroundColor: backgroundColor, selectedColor: selectedColor)
             case .default:
-                return (height: 35, backgroundColor: .white, selectedColor: .clear)
+                return (height: { _ in 35 }, backgroundColor: .white, selectedColor: .clear)
             }
+        }
+
+        func totalHeight(itemsCount: Int) -> CGFloat {
+            (0..<itemsCount)
+                .reduce(0, { $0 + rowStyleValues.height($1) })
         }
     }
 }

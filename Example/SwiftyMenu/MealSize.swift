@@ -18,8 +18,4 @@ extension MealSize: SwiftyMenuDisplayable {
     public var displayableValue: String {
         return self.name
     }
-
-    public var retrievableValue: Any {
-        return self.id
-    }
 }

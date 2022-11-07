@@ -89,6 +89,10 @@ final public class SwiftyMenu: UIView {
     ///   - index: The `Index` of the selected `Item`.
     public var didSelectItem: ((_ swiftyMenu: SwiftyMenu,_ item: SwiftyMenuDisplayable,_ index: Int) -> Void) = { _, _, _ in }
 
+    public var cellContentConfigurator: ((_ cell: UITableViewCell,
+                                          _ item: SwiftyMenuDisplayable,
+                                          _ isSelected: Bool,
+                                          _ attributes: SwiftyMenuAttributes) -> UIContentConfiguration)!
     // MARK: - Private Properties
     
     private var selectButton: UIButton!
@@ -143,6 +147,7 @@ final public class SwiftyMenu: UIView {
 
 // MARK: - UITableViewDataSource Functions
 
+@available(iOS 14.0, *)
 extension SwiftyMenu: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -151,33 +156,60 @@ extension SwiftyMenu: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "OptionCell", for: indexPath)
-        cell.textLabel?.text = items[indexPath.row].displayableValue
-        cell.textLabel?.textColor = attributes.textStyle.textStyleValues.color
-        cell.textLabel?.font = attributes.textStyle.textStyleValues.font
-        cell.textLabel?.textAlignment = attributes.textStyle.textStyleValues.alignment
+        let isSelected = (attributes.multiSelect.isEnabled && selectedIndecis[indexPath.row] != nil)
+        ||
+        (!attributes.multiSelect.isEnabled && selectedIndex == indexPath.row)
+
+        cell.contentConfiguration = cellContentConfigurator(cell,
+                                                            items[indexPath.row],
+                                                            isSelected,
+                                                            attributes)
+
         cell.tintColor = attributes.textStyle.textStyleValues.color
-        cell.backgroundColor = attributes.rowStyle.rowStyleValues.backgroundColor
         cell.selectionStyle = .none
 
-        if attributes.multiSelect.isEnabled {
-            if selectedIndecis[indexPath.row] != nil {
-                cell.textLabel?.textColor = attributes.textStyle.textStyleValues.selectedColor
-                cell.accessoryType = attributes.accessory.isEnabled ? .checkmark : .none
-                cell.backgroundColor = attributes.rowStyle.rowStyleValues.selectedColor
-            } else {
-                cell.accessoryType = .none
-            }
+        if isSelected {
+            cell.accessoryType = attributes.accessory.isEnabled ? .checkmark : .none
+            cell.backgroundColor = attributes.rowStyle.rowStyleValues.selectedColor
         } else {
-            if indexPath.row == selectedIndex {
-                cell.textLabel?.textColor = attributes.textStyle.textStyleValues.selectedColor
-                cell.accessoryType = attributes.accessory.isEnabled ? .checkmark : .none
-                cell.backgroundColor = attributes.rowStyle.rowStyleValues.selectedColor
-            } else {
-                cell.accessoryType = .none
-            }
+            cell.accessoryType = .none
+            cell.backgroundColor = attributes.rowStyle.rowStyleValues.backgroundColor
         }
 
         return cell
+    }
+
+    private func defaultContentConfigurationGenerator(cell: UITableViewCell,
+                                                      item: SwiftyMenuDisplayable,
+                                                      isSelected: Bool,
+                                                      attributes: SwiftyMenuAttributes) -> UIContentConfiguration {
+        var configuration = cell.defaultContentConfiguration()
+        configuration.text = item.displayableValue
+        if let font = attributes.textStyle.textStyleValues.font {
+            configuration.textProperties.font = font
+        }
+
+        let alignment: UIListContentConfiguration.TextProperties.TextAlignment
+        switch attributes.textStyle.textStyleValues.alignment {
+        case .natural, .left, .right:
+            alignment = .natural
+        case .center:
+            alignment = .center
+        case .justified:
+            alignment = .justified
+        @unknown default:
+            alignment = .natural
+        }
+        configuration.textProperties.alignment = alignment
+
+        if isSelected,
+           let selectedColor = attributes.textStyle.textStyleValues.selectedColor {
+            configuration.textProperties.color = selectedColor
+        } else {
+            configuration.textProperties.color = attributes.textStyle.textStyleValues.color
+        }
+
+        return configuration
     }
 }
 
@@ -185,7 +217,7 @@ extension SwiftyMenu: UITableViewDataSource {
 
 extension SwiftyMenu: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return CGFloat(attributes.rowStyle.rowStyleValues.height)
+        return attributes.rowStyle.rowStyleValues.height(indexPath.row)
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -281,16 +313,18 @@ extension SwiftyMenu {
         }
         selectButton.titleLabel?.font = attributes.textStyle.textStyleValues.font
 
-        selectButton.imageEdgeInsets.right = width - 16
-        selectButton.imageEdgeInsets.left = width - 16
-        
+        let imageInset: CGFloat = 16
+        let titleInset: CGFloat = 4
+        selectButton.imageEdgeInsets.right = width - imageInset
+        selectButton.imageEdgeInsets.left = width - imageInset
+
         if UIView.userInterfaceLayoutDirection(for: selectButton.semanticContentAttribute) == .rightToLeft {
-            selectButton.titleEdgeInsets.right = 16
-            selectButton.titleEdgeInsets.left = attributes.arrowStyle.arrowStyleValues.isEnabled ? 32 : 16
+            selectButton.titleEdgeInsets.right = imageInset
+            selectButton.titleEdgeInsets.left = attributes.arrowStyle.arrowStyleValues.isEnabled ? (imageInset - titleInset) : imageInset
             selectButton.titleLabel?.lineBreakMode = .byTruncatingHead
         } else {
-            selectButton.titleEdgeInsets.right = attributes.arrowStyle.arrowStyleValues.isEnabled ? 32 : 16
-            selectButton.titleEdgeInsets.left = 16
+            selectButton.titleEdgeInsets.right = attributes.arrowStyle.arrowStyleValues.isEnabled ? (imageInset - titleInset) : imageInset
+            selectButton.titleEdgeInsets.left = imageInset
             selectButton.titleLabel?.lineBreakMode = .byTruncatingTail
         }
 
@@ -300,15 +334,15 @@ extension SwiftyMenu {
 
         if attributes.arrowStyle.arrowStyleValues.isEnabled {
             if UIView.userInterfaceLayoutDirection(for: selectButton.semanticContentAttribute) == .rightToLeft {
-                selectButton.titleEdgeInsets.right = 4
+                selectButton.titleEdgeInsets.right = titleInset
             } else {
-                selectButton.titleEdgeInsets.left = 4
+                selectButton.titleEdgeInsets.left = titleInset
             }
             selectButton.setImage(arrow, for: .normal)
         }
-        
+
         selectButton.contentHorizontalAlignment = attributes.headerStyle.headerStyleValues.contentHorizontalAlignment
-        
+
         selectButton.addTarget(self, action: #selector(handleMenuState), for: .touchUpInside)
     }
     
@@ -322,13 +356,17 @@ extension SwiftyMenu {
         
         itemsTableView.delegate = self
         itemsTableView.dataSource = self
-        itemsTableView.rowHeight = CGFloat(attributes.rowStyle.rowStyleValues.height)
+        itemsTableView.estimatedRowHeight = 30
         itemsTableView.separatorInset.left = 8
         itemsTableView.separatorInset.right = 8
         itemsTableView.backgroundColor = attributes.rowStyle.rowStyleValues.backgroundColor
         itemsTableView.isScrollEnabled = attributes.scroll.isEnabled
         itemsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "OptionCell")
         itemsTableView.showsVerticalScrollIndicator = false
+
+        if cellContentConfigurator == nil {
+            cellContentConfigurator = defaultContentConfigurationGenerator
+        }
     }
     
     @objc private func handleMenuState() {
@@ -406,7 +444,9 @@ extension SwiftyMenu {
     private func expandSwiftyMenu() {
         delegate?.swiftyMenu(willExpand: self)
         self.willExpand()
-        heightConstraint.constant = attributes.height.listHeightValue == 0 || !attributes.scroll.isEnabled || (CGFloat(Double(attributes.rowStyle.rowStyleValues.height) * Double(items.count + 1)) < CGFloat(attributes.height.listHeightValue)) ? CGFloat(Double(attributes.rowStyle.rowStyleValues.height) * Double(items.count + 1)) : CGFloat(attributes.height.listHeightValue)
+        let allRowsHeight = attributes.rowStyle.totalHeight(itemsCount: items.count)
+        let potentialHeight = allRowsHeight + CGFloat(attributes.headerStyle.headerStyleValues.height)
+        heightConstraint.constant = attributes.height.listHeightValue == 0 || !attributes.scroll.isEnabled || (potentialHeight < CGFloat(attributes.height.listHeightValue)) ? potentialHeight : CGFloat(attributes.height.listHeightValue)
 
         switch attributes.expandingAnimation {
         case .linear:

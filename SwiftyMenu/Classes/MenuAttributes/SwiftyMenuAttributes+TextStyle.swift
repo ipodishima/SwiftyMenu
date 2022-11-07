@@ -34,7 +34,7 @@ public extension SwiftyMenuAttributes {
 
         case value(color: UIColor, selectedColor: UIColor? = nil, separator: String, font: UIFont?, alignment: NSTextAlignment = .left)
 
-        var textStyleValues: (color: UIColor, selectedColor: UIColor?, separator: String, font: UIFont?, alignment: NSTextAlignment) {
+        public var textStyleValues: (color: UIColor, selectedColor: UIColor?, separator: String, font: UIFont?, alignment: NSTextAlignment) {
             switch self {
             case let .value(color, selectedColor, separator, font, alignment):
                 return (color: color, selectedColor ?? color, separator: separator, font: font, alignment: alignment)

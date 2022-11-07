@@ -13,8 +13,4 @@ extension String: SwiftyMenuDisplayable {
     public var displayableValue: String {
         return self
     }
-
-    public var retrievableValue: Any {
-        return self
-    }
 }

@@ -165,10 +165,6 @@ extension String: SwiftyMenuDisplayable {
     public var displayableValue: String {
         return self
     }
-    
-    public var retrivableValue: Any {
-        return self
-    }
 }
 ```
 - Example of custom `Struct`
@@ -182,10 +178,6 @@ struct MealSize {
 extension MealSize: SwiftyMenuDisplayable {
     public var displayableValue: String {
         return self.name
-    }
-
-    public var retrievableValue: Any {
-        return self.id
     }
 }
 ```

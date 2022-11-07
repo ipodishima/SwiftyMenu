@@ -19,6 +19,8 @@
 		BC7A3009242BF9B900B76276 /* SwiftyMenuDelegateSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7A3007242BF9B400B76276 /* SwiftyMenuDelegateSpy.swift */; };
 		BC8E4C6A2690AD4700029145 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8E4C692690AD4600029145 /* String+Extensions.swift */; };
 		BC8E4C6C2690AD7C00029145 /* MealSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8E4C6B2690AD7C00029145 /* MealSize.swift */; };
+		E0AE383829191B4500B2B855 /* MealSizeMenuContentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0AE383729191B4500B2B855 /* MealSizeMenuContentConfiguration.swift */; };
+		E0AE383A29191B8000B2B855 /* MealSizeMenuContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0AE383929191B8000B2B855 /* MealSizeMenuContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,8 @@
 		BC8E4C692690AD4600029145 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		BC8E4C6B2690AD7C00029145 /* MealSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealSize.swift; sourceTree = "<group>"; };
 		DD0DD0B626C9414217DC8F17 /* Pods_SwiftyMenu_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftyMenu_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0AE383729191B4500B2B855 /* MealSizeMenuContentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealSizeMenuContentConfiguration.swift; sourceTree = "<group>"; };
+		E0AE383929191B8000B2B855 /* MealSizeMenuContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealSizeMenuContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +133,8 @@
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
+				E0AE383929191B8000B2B855 /* MealSizeMenuContentView.swift */,
+				E0AE383729191B4500B2B855 /* MealSizeMenuContentConfiguration.swift */,
 			);
 			name = "Example for SwiftyMenu";
 			path = SwiftyMenu;
@@ -373,7 +379,9 @@
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				BC8E4C6A2690AD4700029145 /* String+Extensions.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				E0AE383A29191B8000B2B855 /* MealSizeMenuContentView.swift in Sources */,
 				BC8E4C6C2690AD7C00029145 /* MealSize.swift in Sources */,
+				E0AE383829191B4500B2B855 /* MealSizeMenuContentConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,7 +473,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -515,7 +523,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -529,7 +537,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SwiftyMenu/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -544,7 +552,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SwiftyMenu/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -566,7 +574,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -584,7 +592,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";

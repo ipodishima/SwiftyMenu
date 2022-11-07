@@ -14,6 +14,7 @@ class ViewController: UIViewController {
 
     @IBOutlet private weak var dropDown: SwiftyMenu!
     @IBOutlet private weak var otherView: UIView!
+    private var dropDownCode: SwiftyMenu!
 
     /// Define menu data source
     /// The data source type should conform to `SwiftyMenuDisplayable`
@@ -30,6 +31,12 @@ class ViewController: UIViewController {
         MealSize(id: 4, name: "Combo Large"),
     ]
 
+    private let dropDownContentConfigurationOptionsDataSource = [
+        MealSize(id: 1, name: "Small"),
+        MealSize(id: 2, name: "Medium"),
+        MealSize(id: 3, name: "Large"),
+    ]
+
     /// Define menu attributes
     private var storyboardMenuAttributes: SwiftyMenuAttributes {
         var attributes = SwiftyMenuAttributes()
@@ -41,7 +48,7 @@ class ViewController: UIViewController {
 
         // Custom UI
         attributes.roundCorners = .all(radius: 8)
-        attributes.rowStyle = .value(height: 35, backgroundColor: .white, selectedColor: UIColor.gray.withAlphaComponent(0.1))
+        attributes.rowStyle = .value(height: { _ in 35 }, backgroundColor: .white, selectedColor: UIColor.gray.withAlphaComponent(0.1))
         attributes.headerStyle = .value(backgroundColor: .white, height: 35)
         attributes.placeHolderStyle = .value(text: "Please Select Item", textColor: .lightGray)
         attributes.textStyle = .value(color: .gray, separator: " & ", font: .systemFont(ofSize: 12))
@@ -69,10 +76,38 @@ class ViewController: UIViewController {
 
         // Custom UI
         attributes.roundCorners = .all(radius: 8)
-        attributes.rowStyle = .value(height: 39, backgroundColor: .white, selectedColor: .white)
+        attributes.rowStyle = .value(height: { _ in 39 }, backgroundColor: .white, selectedColor: .white)
+        attributes.headerStyle = .value(backgroundColor: .white, contentHorizontalAlignment: .center, height: 40)
+        attributes.placeHolderStyle = .value(text: "Please Select Size", textColor: .lightGray)
+        attributes.textStyle = .value(color: .gray, separator: " & ", font: .systemFont(ofSize: 12), alignment: .center)
+        attributes.separatorStyle = .value(color: .black, isBlured: false, style: .singleLine)
+        attributes.arrowStyle = .value(isEnabled: true)
+        attributes.accessory = .disabled
+
+        // Custom Animations
+        attributes.expandingAnimation = .linear
+        attributes.expandingTiming = .value(duration: 0.5, delay: 0)
+
+        attributes.collapsingAnimation = .linear
+        attributes.collapsingTiming = .value(duration: 0.5, delay: 0)
+
+        return attributes
+    }
+
+    private var contentConfigurationMenuAttributes: SwiftyMenuAttributes {
+        var attributes = SwiftyMenuAttributes()
+
+        // Custom Behavior
+        attributes.multiSelect = .disabled
+        attributes.scroll = .disabled
+        attributes.hideOptionsWhenSelect = .enabled
+
+        // Custom UI
+        attributes.roundCorners = .all(radius: 8)
+        attributes.rowStyle = .value(height: { CGFloat(30 * ($0 + 1)) }, backgroundColor: .white, selectedColor: .white)
         attributes.headerStyle = .value(backgroundColor: .white, height: 40)
         attributes.placeHolderStyle = .value(text: "Please Select Size", textColor: .lightGray)
-        attributes.textStyle = .value(color: .gray, separator: " & ", font: .systemFont(ofSize: 12))
+        attributes.textStyle = .value(color: .gray, separator: " & ", font: .systemFont(ofSize: 12), alignment: .center)
         attributes.separatorStyle = .value(color: .black, isBlured: false, style: .singleLine)
         attributes.arrowStyle = .value(isEnabled: false)
         attributes.accessory = .disabled
@@ -92,6 +127,7 @@ class ViewController: UIViewController {
 
         setupStoryboardMenu()
         setupCodeMenu()
+        setupContentConfigurationMenu()
     }
 
     /// Example of building SwiftyMenu from Storyboard
@@ -155,6 +191,64 @@ class ViewController: UIViewController {
 
         /// Configure SwiftyMenu with the attributes
         dropDownCode.configure(with: codeMenuAttributes)
+        self.dropDownCode = dropDownCode
+    }
+
+    private func setupContentConfigurationMenu() {
+
+        /// Init SwiftyMenu from Code
+        let dropDownContent = SwiftyMenu(frame: CGRect(x: 0, y: 0, width: 0, height: 40))
+
+        /// Add it as subview
+        view.addSubview(dropDownContent)
+
+        /// Add constraints to SwiftyMenu
+        /// You must take care of `hegiht` constraint, please.
+        dropDownContent.translatesAutoresizingMaskIntoConstraints = false
+        let horizontalConstraint = NSLayoutConstraint(item: dropDownContent, attribute: NSLayoutConstraint.Attribute.centerX, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerX, multiplier: 1, constant: 0)
+        let topConstraint = NSLayoutConstraint(item: dropDownContent, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: dropDownCode, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 14)
+        let widthConstraint = NSLayoutConstraint(item: dropDownContent, attribute: NSLayoutConstraint.Attribute.width, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 255)
+        dropDownContent.heightConstraint = NSLayoutConstraint(item: dropDownContent, attribute: NSLayoutConstraint.Attribute.height, relatedBy: NSLayoutConstraint.Relation.equal, toItem: nil, attribute: NSLayoutConstraint.Attribute.notAnAttribute, multiplier: 1, constant: 40)
+        NSLayoutConstraint.activate(
+            [
+                horizontalConstraint,
+                topConstraint,
+                widthConstraint,
+                dropDownContent.heightConstraint
+            ]
+        )
+
+        dropDownContent.cellContentConfigurator = { _, item, isSelected, attributes in
+            guard let mealSize = item as? MealSize else { fatalError("") }
+            return MealSizeMenuContentConfiguration(item: mealSize, isSelected: isSelected, attributes: attributes)
+        }
+
+        /// Setup SwiftyMenu data source
+        dropDownContent.items = dropDownContentConfigurationOptionsDataSource
+
+        /// SwiftyMenu also supports `CallBacks`
+        dropDownContent.willExpand = {
+            print("SwiftyMenu Content Will Expand!")
+        }
+
+        dropDownContent.didExpand = {
+            print("SwiftyMenu Content Expanded!")
+        }
+
+        dropDownContent.willCollapse = {
+            print("SwiftyMenu Content Will Collapse!")
+        }
+
+        dropDownContent.didCollapse = {
+            print("SwiftyMenu Content Collapsed!")
+        }
+
+        dropDownContent.didSelectItem = { _, item, index in
+            print("Selected from Content \(item) at index: \(index)")
+        }
+
+        /// Configure SwiftyMenu with the attributes
+        dropDownContent.configure(with: contentConfigurationMenuAttributes)
     }
 
 }

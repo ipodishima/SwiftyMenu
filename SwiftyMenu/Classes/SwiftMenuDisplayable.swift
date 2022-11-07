@@ -28,7 +28,4 @@ import Foundation
 public protocol SwiftyMenuDisplayable {
     /// The value that will be displayed in the menu item
     var displayableValue: String { get }
-    
-    /// The value that will be returned when select menu item
-    var retrievableValue: Any { get }
 }
